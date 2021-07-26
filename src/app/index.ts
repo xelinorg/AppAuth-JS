@@ -25,6 +25,10 @@ import {TokenResponse} from '../token_response';
 import { AuthorizationResponse } from '../authorization_response';
 import { StringMap } from '../types';
 
+
+import { MeRequest } from '../me_request';
+import { MeRequestHandler } from '../me_request_handler';
+
 /* Some interface declarations for Material design lite. */
 
 /**
@@ -43,11 +47,11 @@ declare interface MaterialSnackBar {
 }
 
 /* an example open id connect provider */
-const openIdConnectUrl = 'https://accounts.google.com';
+const openIdConnectUrl = 'https://oap.localnet:36936';
 
 /* example client configuration */
-const clientId = '511828570984-7nmej36h9j2tebiqmpqh835naet4vci4.apps.googleusercontent.com';
-const redirectUri = 'http://localhost:8000/app/redirect.html';
+const clientId = 'foo';
+const redirectUri = 'https://oap.localnet:8000/app/redirect.html';
 const scope = 'openid';
 
 /**
@@ -57,7 +61,7 @@ export class App {
   private notifier: AuthorizationNotifier;
   private authorizationHandler: AuthorizationRequestHandler;
   private tokenHandler: TokenRequestHandler;
-
+  private meHandler: MeRequestHandler;
   // state
   private configuration: AuthorizationServiceConfiguration|undefined;
   private request: AuthorizationRequest|undefined;
@@ -69,6 +73,7 @@ export class App {
     this.notifier = new AuthorizationNotifier();
     this.authorizationHandler = new RedirectRequestHandler();
     this.tokenHandler = new BaseTokenRequestHandler();
+    this.meHandler = new MeRequestHandler();
     // set notifier to deliver responses
     this.authorizationHandler.setAuthorizationNotifier(this.notifier);
     // set a listener to listen for authorization responses
@@ -101,12 +106,12 @@ export class App {
         });
   }
 
-  makeAuthorizationRequest() {
+  makeAuthorizationRequest(lscope: string) {
     // create a request
     let request = new AuthorizationRequest({
       client_id: clientId,
       redirect_uri: redirectUri,
-      scope: scope,
+      scope: lscope,
       response_type: AuthorizationRequest.RESPONSE_TYPE_CODE,
       state: undefined,
       extras: {'prompt': 'consent', 'access_type': 'offline'}
@@ -118,6 +123,30 @@ export class App {
       this.showMessage(
           'Fetch Authorization Service configuration, before you make the authorization request.');
     }
+  }
+
+  makeMeRequest() {
+
+    if (!this.configuration) {
+      this.showMessage('Please fetch service configuration.');
+      return;
+    }
+
+    let request: MeRequest|null = null;
+
+    request = new MeRequest({
+      token: this.tokenResponse && this.tokenResponse.accessToken ? this.tokenResponse.accessToken : ''
+    });
+
+    this.meHandler.performMeRequest(this.configuration, request)
+        .then(response => {
+          this.showMessage(`Obtained me ${JSON.stringify(response)}.`);
+        })
+        .catch(error => {
+          log('Something bad happened', error);
+          this.showMessage(`Something bad happened ${error}`)
+        });
+
   }
 
   makeTokenRequest() {
