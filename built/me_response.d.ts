@@ -1,9 +1,8 @@
 export interface MeResponseJson {
     sub: string;
-    profile?: {
-        website?: string;
-        gender?: string;
-    };
+    website?: string;
+    gender?: string;
+    name?: string;
 }
 export declare type ErrorType = 'invalid_request' | 'invalid_client' | 'invalid_grant' | 'unauthorized_client' | 'unsupported_grant_type' | 'invalid_scope';
 /**
@@ -17,10 +16,9 @@ export interface MeErrorJson {
 }
 export declare class MeResponse {
     sub: string;
-    profile?: {
-        website?: string;
-        gender?: string;
-    };
+    website?: string;
+    gender?: string;
+    name?: string;
     constructor(response: MeResponseJson);
     toJson(): MeResponseJson;
 }

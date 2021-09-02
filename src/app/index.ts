@@ -47,11 +47,11 @@ declare interface MaterialSnackBar {
 }
 
 /* an example open id connect provider */
-const openIdConnectUrl = 'https://oap.localnet:36936';
+const openIdConnectUrl = 'https://oap.localnet/';
 
 /* example client configuration */
 const clientId = 'foo';
-const redirectUri = 'https://oap.localnet:8000/app/redirect.html';
+const redirectUri = 'https://acc.localnet/app/redirect.html';
 const scope = 'openid';
 
 /**
